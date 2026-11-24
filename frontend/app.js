@@ -171,6 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initializes UI default state.
  */
 function initUI() {
+  // Keep the current page clear in the shared navigation on every page.
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach((link) => {
+    const isCurrent = link.getAttribute('href') === currentPage;
+    link.classList.toggle('active', isCurrent);
+    if (isCurrent) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+
   if (!isMetaMaskInstalled() && DOM.walletBtnText && DOM.networkNameText) {
     DOM.walletBtnText.textContent = 'Install MetaMask';
     DOM.networkNameText.textContent = 'MetaMask Required';
@@ -193,6 +202,21 @@ function initUI() {
         }
       }
     });
+  });
+
+  // Close the mobile menu after navigation or when the user dismisses it.
+  const closeMobileMenu = () => {
+    if (!DOM.navLinks || !DOM.menuToggle) return;
+    DOM.navLinks.classList.remove('mobile-open');
+    DOM.menuToggle.setAttribute('aria-expanded', 'false');
+    DOM.menuToggle.setAttribute('aria-label', 'Open navigation menu');
+  };
+  DOM.navLinks?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobileMenu));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMobileMenu();
+  });
+  document.addEventListener('click', (event) => {
+    if (DOM.navLinks?.classList.contains('mobile-open') && !event.target.closest('.navbar')) closeMobileMenu();
   });
 
   const hash = new URLSearchParams(window.location.search).get('hash');
@@ -226,6 +250,7 @@ function setupEventListeners() {
   DOM.menuToggle?.addEventListener('click', () => {
     const isOpen = DOM.navLinks.classList.toggle('mobile-open');
     DOM.menuToggle.setAttribute('aria-expanded', String(isOpen));
+    DOM.menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
   });
 
   // Wallet Connection Button

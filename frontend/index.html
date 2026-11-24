@@ -15,8 +15,28 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Main Stylesheet -->
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha512-V3xRGsQMQ8CG4l2gVN44TCDmNY5cdlxbSvejrgmWxcLKHft0Q3XQDbeuJ9aot14mpNuRWGtI//WKraedDGNZ+g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
+  <header class="navbar-wrapper">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a href="index.html" class="brand-logo" aria-label="DocuChain home"><img src="assets/logo.svg" alt="DocuChain" class="logo-img" width="168" height="42"></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link active" aria-current="page">Home</a></li>
+        <li><a href="how-it-works.html" class="nav-link">How it works</a></li>
+        <li><a href="register.html" class="nav-link">Register</a></li>
+        <li><a href="verify.html" class="nav-link">Verify</a></li>
+        <li><a href="documents.html" class="nav-link">My documents</a></li>
+        <li><a href="history.html" class="nav-link">Activity</a></li>
+      </ul>
+      <div class="nav-actions">
+        <div id="networkPill" class="network-pill disconnected" title="Network status"><span class="status-dot"></span><span id="networkNameText">Not Connected</span></div>
+        <button id="walletBtn" class="btn btn-wallet" type="button"><span class="wallet-btn-icon" aria-hidden="true">◇</span><span id="walletBtnText">Connect Wallet</span></button>
+        <button id="disconnectBtn" class="btn-disconnect-icon hidden" type="button" title="Disconnect session" aria-label="Disconnect session">↪</button>
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      </div>
+    </nav>
+  </header>
 <main>
     <section id="hero" class="hero-section">
       <div class="container hero-grid">
@@ -85,10 +105,10 @@
         <h4 class="footer-heading">Quick Links</h4>
         <ul class="footer-links">
           <li><a href="index.html">Home</a></li>
-          <li><a href="how-it-works.html">How It Works</a></li>
-          <li><a href="register.html">Register Document</a></li>
-          <li><a href="verify.html">Verify Document</a></li>
-          <li><a href="documents.html">My Documents</a></li>
+          <li><a href="how-it-works.html">How it works</a></li>
+          <li><a href="register.html">Register</a></li>
+          <li><a href="verify.html">Verify</a></li>
+          <li><a href="documents.html">My documents</a></li>
         </ul>
       </div>
 
@@ -109,5 +129,7 @@
       <p class="zero-storage">Zero-Storage Architecture: Client files are cryptographically hashed in-memory only.</p>
     </div>
   </footer>
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

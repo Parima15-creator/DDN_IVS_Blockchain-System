@@ -185,7 +185,7 @@ Open [https://remix.ethereum.org](https://remix.ethereum.org) in your browser.
 
 ### Step 2: Create Contract File
 1. In the Remix File Explorer, create a new file named `DocuChain.sol`.
-2. Copy the entire contents of [`contracts/DocuChain.sol`](file:///c:/Users/aryad/OneDrive/Desktop/blockchain/contracts/DocuChain.sol) into the file.
+2. Copy the entire contents of [`contracts/DocuChain.sol`](contracts/DocuChain.sol) into the file.
 
 ### Step 3: Compile Contract
 1. Navigate to the **Solidity Compiler** tab (left sidebar).
@@ -203,12 +203,15 @@ Open [https://remix.ethereum.org](https://remix.ethereum.org) in your browser.
 
 ### Step 5: Configure the Frontend
 1. Under **Deployed Contracts** in Remix, copy the contract address (e.g., `0x71C...92AB`).
-2. Open [`frontend/config.js`](file:///c:/Users/aryad/OneDrive/Desktop/blockchain/frontend/config.js).
+2. Open [`frontend/config.js`](frontend/config.js).
 3. Paste the address into `CONTRACT_ADDRESS`:
    ```javascript
    export const CONTRACT_ADDRESS = "0xYourDeployedContractAddressHere";
    ```
-4. Save the file. The frontend will immediately connect to your contract!
+4. Save the file, then serve the `frontend` folder over HTTP (see the next section) and reload the page.
+5. Keep MetaMask on Sepolia and connect it in the app. The configured chain in `config.js` must match the network where you deployed the contract.
+
+Remix deploys the Solidity contract; it does not host or directly attach the website. The frontend talks to the deployed address through MetaMask and Ethers.js.
 
 ---
 

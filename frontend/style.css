@@ -1825,3 +1825,73 @@ button {
     border-radius: var(--radius-sm);
   }
 }
+
+/* Refined shared navigation and brand treatment */
+.navbar-wrapper {
+  background: rgba(250, 252, 250, 0.94);
+  border-bottom-color: rgba(203, 217, 208, 0.75);
+  box-shadow: 0 4px 18px rgba(23, 47, 37, 0.035);
+}
+
+.navbar { gap: 20px; }
+.brand-logo { flex: 0 0 auto; }
+.logo-img { height: 48px; }
+.nav-links { gap: 4px; }
+.nav-link { font-size: 0.84rem; padding: 9px 10px; white-space: nowrap; }
+.nav-link.active { color: #103a83; background: #eaf0fb; }
+.nav-link:hover { color: #103a83; }
+.btn-wallet { white-space: nowrap; }
+.menu-toggle { flex: 0 0 auto; }
+
+.hero-section {
+  background: radial-gradient(ellipse at 82% 35%, rgba(20, 158, 141, .11), transparent 38%),
+              radial-gradient(ellipse at 6% 4%, rgba(28, 67, 145, .07), transparent 32%),
+              var(--bg-sage);
+}
+.hero-title { letter-spacing: -0.055em; }
+.hero-visual-card { border: 1px solid rgba(255,255,255,.85); }
+.btn { transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast); }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:focus-visible, .nav-link:focus-visible, a:focus-visible, input:focus-visible, button:focus-visible {
+  outline: 3px solid rgba(22, 117, 151, .45);
+  outline-offset: 3px;
+}
+
+@media (max-width: 980px) {
+  .navbar { gap: 12px; }
+  .menu-toggle { display: flex; }
+  .nav-links {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 18px max(24px, calc((100vw - var(--container-max-width)) / 2 + 24px));
+    gap: 6px;
+    align-items: stretch;
+    background: rgba(250, 252, 250, .98);
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--transition-normal), transform var(--transition-normal), visibility var(--transition-normal);
+    z-index: 910;
+  }
+  .nav-links.mobile-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .nav-link { display: block; width: 100%; padding: 12px 14px; font-size: .95rem; }
+}
+
+@media (max-width: 520px) {
+  .container { padding-left: 18px; padding-right: 18px; }
+  .logo-img { height: 42px; }
+  .navbar { gap: 8px; }
+  .nav-actions { gap: 8px; }
+  .btn-wallet { padding: 9px 12px; font-size: .8rem; }
+}
