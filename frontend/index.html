@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuChain — Blockchain-Based Document Registration & Verification System</title>
+  <meta name="description" content="Secure, tamper-proof digital document registration and verification powered by Ethereum smart contracts and SHA-256 cryptographic hashing.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Google Fonts: Plus Jakarta Sans for a clean, modern SaaS aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Ethers.js v6 via CDN (UMD bundle) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha512-V1ukgqpxsmvTsvUmmwLpdElcxKkdcupBwkkOmStKAW+PshMClbXdaStmAclwsmzT0vHbeV+ZOnq/U3Qy4v5/sQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================================================================= -->
+  <!-- NETWORK ALERT BANNER (Shown when connected to wrong network)     -->
+  <!-- ================================================================= -->
+  <aside id="networkBanner" class="network-banner hidden" role="alert" aria-live="assertive">
+    <div class="network-banner-content">
+      <span class="banner-icon">⚠️</span>
+      <span id="networkBannerText">You are connected to an unsupported network. Please switch to the expected network.</span>
+      <button id="switchNetworkBtn" class="btn-banner-action" type="button">Switch Network</button>
+    </div>
+  </aside>
+
+  <!-- ================================================================= -->
+  <!-- NAVIGATION BAR                                                    -->
+  <!-- ================================================================= -->
+  <header class="navbar-wrapper">
+    <nav class="navbar container" aria-label="Main Navigation">
+      <!-- Logo -->
+      <a href="#hero" class="brand-logo" aria-label="DocuChain Home">
+        <img src="assets/logo.svg" alt="DocuChain" class="logo-img" width="168" height="42">
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="#register-section" class="nav-link">Register Document</a></li>
+        <li><a href="#verify-section" class="nav-link">Verify Document</a></li>
+        <li><a href="#my-documents" class="nav-link">My Documents</a></li>
+        <li><a href="#blockchain-history" class="nav-link">Blockchain History</a></li>
+      </ul>
+
+      <!-- Wallet Controls -->
+      <div class="nav-actions">
+        <!-- Network Badge -->
+        <div id="networkPill" class="network-pill disconnected" title="Network status">
+          <span class="status-dot"></span>
+          <span id="networkNameText">Not Connected</span>
+        </div>
+
+        <!-- Connect Wallet Button -->
+        <button id="walletBtn" class="btn btn-wallet" type="button">
+          <span class="wallet-btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+            </svg>
+          </span>
+          <span id="walletBtnText">Connect Wallet</span>
+        </button>
+
+        <!-- Disconnect dropdown button (hidden by default) -->
+        <button id="disconnectBtn" class="btn-disconnect-icon hidden" type="button" title="Disconnect Session" aria-label="Disconnect Session">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content Container -->
+  <main>
+    <!-- ================================================================= -->
+    <!-- SECTION 1: HERO (Inspired by KeyNest layout & palette)           -->
+    <!-- ================================================================= -->
+    <section id="hero" class="hero-section">
+      <div class="container hero-grid">
+        <!-- Hero Left Column: Heading, Subtext, CTAs, Trust Indicators -->
+        <div class="hero-content">
+          <div class="hero-pill-badge">
+            <span class="pill-dot"></span>
+            <span>Cryptographic Proof of Existence</span>
+          </div>
+
+          <h1 class="hero-title">
+            Your Documents.<br>
+            Secured by <span class="highlight-box">Blockchain.</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            Register, protect and verify your digital documents with the transparency and security of blockchain technology. Never upload original files — cryptographic SHA-256 fingerprints ensure complete on-chain privacy.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#register-section" class="btn btn-primary btn-large">
+              Register a Document
+            </a>
+            <span class="cta-divider">or</span>
+            <a href="#verify-section" class="btn btn-secondary btn-large">
+              Verify a Document
+            </a>
+          </div>
+
+          <!-- Trust Badges List -->
+          <div class="hero-trust-indicators">
+            <div class="trust-item">
+              <span class="trust-icon">✓</span>
+              <span>Blockchain Secured</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">✓</span>
+              <span>Tamper-Proof Records</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">✓</span>
+              <span>Decentralized Verification</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Right Column: High-fidelity visual card presentation -->
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <img src="assets/illustrations/hero-graphic.svg" alt="DocuChain Document Verification Architecture Illustration" class="hero-illustration" width="520" height="440">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 2: HOW IT WORKS (3 Simple Steps)                         -->
+    <!-- ================================================================= -->
+    <section id="how-it-works" class="section how-it-works-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-category">ARCHITECTURE & WORKFLOW</span>
+          <h2 class="section-title">How DocuChain Operates</h2>
+          <p class="section-subtitle">
+            Three simple steps guarantee document provenance, tamper detection, and public trust without sacrificing personal privacy.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <!-- Step 1 Card -->
+          <div class="step-card">
+            <div class="step-number">01</div>
+            <div class="step-icon-wrapper">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3 class="step-title">1. Client-Side Hash</h3>
+            <p class="step-description">
+              Users select any digital document. The browser computes a 256-bit cryptographic SHA-256 fingerprint in local memory using the Web Crypto API. The actual document never leaves your machine.
+            </p>
+          </div>
+
+          <!-- Step 2 Card -->
+          <div class="step-card">
+            <div class="step-number">02</div>
+            <div class="step-icon-wrapper">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <h3 class="step-title">2. Blockchain Anchor</h3>
+            <p class="step-description">
+              The generated hash and document title are submitted to the Solidity smart contract via MetaMask. An immutable, timestamped record is permanently sealed into an Ethereum block.
+            </p>
+          </div>
+
+          <!-- Step 3 Card -->
+          <div class="step-card">
+            <div class="step-number">03</div>
+            <div class="step-icon-wrapper">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+            </div>
+            <h3 class="step-title">3. Instant Verification</h3>
+            <p class="step-description">
+              Anyone can verify a document by re-hashing it or providing the hash. The smart contract validates ownership, registration timestamp, and revocation state in milliseconds.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 3: REGISTER DOCUMENT                                      -->
+    <!-- ================================================================= -->
+    <section id="register-section" class="section register-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-category">DOCUMENT ONBOARDING</span>
+          <h2 class="section-title">Register a New Document</h2>
+          <p class="section-subtitle">
+            Generate an immutable cryptographic proof on the blockchain. Your file content remains strictly confidential.
+          </p>
+        </div>
+
+        <div class="app-card-wrapper">
+          <div class="app-card">
+            <form id="registerForm" class="document-form" novalidate>
+              <!-- Document Title -->
+              <div class="form-group">
+                <label for="docTitleInput" class="form-label">
+                  Document Title / Description <span class="required">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="docTitleInput" 
+                  class="form-control" 
+                  placeholder="e.g. University Degree Certificate, Property Deed, NDA 2026"
+                  required
+                  maxlength="120"
+                >
+                <span class="form-hint">Enter a descriptive title for easy identification on-chain.</span>
+              </div>
+
+              <!-- Drag & Drop File Upload Area -->
+              <div class="form-group">
+                <label class="form-label">
+                  Select Document File <span class="required">*</span>
+                </label>
+                <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="Upload document area. Drag and drop file or click to select">
+                  <input type="file" id="fileInput" class="file-input-hidden" aria-label="Choose file">
+                  <div class="drop-zone-content">
+                    <div class="drop-zone-icon">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                    </div>
+                    <p class="drop-zone-primary">
+                      <span class="link-styled">Click to browse</span> or drag and drop your document here
+                    </p>
+                    <p class="drop-zone-secondary">
+                      Supports PDF, DOCX, TXT, PNG, JPG, or any digital asset. Max 100MB.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- File Information Card (Populated after file selection) -->
+              <div id="fileInfoCard" class="file-info-card hidden">
+                <div class="file-info-header">
+                  <div class="file-badge-icon">📄</div>
+                  <div class="file-details">
+                    <div id="fileInfoName" class="file-name">filename.pdf</div>
+                    <div class="file-meta">
+                      <span id="fileInfoSize">0 KB</span> • <span id="fileInfoType">application/pdf</span>
+                    </div>
+                  </div>
+                  <button id="removeFileBtn" class="btn-text-danger" type="button" title="Remove selected file">Remove</button>
+                </div>
+
+                <!-- Generated SHA-256 Hash Display -->
+                <div class="hash-display-box">
+                  <div class="hash-label-row">
+                    <span class="hash-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      </svg>
+                      Calculated SHA-256 Hash (bytes32 hex format)
+                    </span>
+                    <button id="copyHashBtn" class="btn-copy" type="button" title="Copy hash to clipboard">
+                      <span class="copy-icon">📋</span> Copy Hash
+                    </button>
+                  </div>
+                  <div id="generatedHashDisplay" class="hash-value">Calculating cryptographic hash...</div>
+                </div>
+              </div>
+
+              <!-- Contract Configuration Notice (shown if address is empty in config.js) -->
+              <div id="contractConfigNotice" class="config-notice-box hidden">
+                <div class="notice-icon">⚙️</div>
+                <div class="notice-content">
+                  <strong>Contract Configuration Required:</strong>
+                  <span>Please provide your deployed contract address and ABI in <code>config.js</code> to submit on-chain transactions.</span>
+                </div>
+              </div>
+
+              <!-- Transaction Status Container -->
+              <div id="txStatusCard" class="tx-status-card hidden">
+                <div class="tx-status-header">
+                  <span id="txStatusIndicator" class="tx-indicator"></span>
+                  <span id="txStatusTitle" class="tx-title">Transaction Status</span>
+                </div>
+                <p id="txStatusMessage" class="tx-message">Preparing transaction...</p>
+                <div id="txHashRow" class="tx-hash-row hidden">
+                  <span class="tx-hash-label">Tx Hash:</span>
+                  <a id="txHashLink" href="#" target="_blank" rel="noopener noreferrer" class="tx-hash-link">0x...</a>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="form-actions">
+                <button id="registerBtn" class="btn btn-primary btn-block" type="submit" disabled>
+                  <span class="btn-spinner hidden" id="registerSpinner"></span>
+                  <span id="registerBtnText">Register Document on Blockchain</span>
+                </button>
+              </div>
+
+              <div class="privacy-assurance">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span>Zero File Upload Guarantee: Your document data is never sent to any server.</span>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 4: VERIFY DOCUMENT                                        -->
+    <!-- ================================================================= -->
+    <section id="verify-section" class="section verify-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-category">INTEGRITY CHECK</span>
+          <h2 class="section-title">Verify Document Authenticity</h2>
+          <p class="section-subtitle">
+            Confirm whether a document has been registered on the blockchain and inspect its authoritative timestamp, owner, and revocation status.
+          </p>
+        </div>
+
+        <div class="app-card-wrapper">
+          <div class="app-card">
+            <!-- Verification Mode Switcher Tabs -->
+            <div class="verify-tabs" role="tablist" aria-label="Verification Method">
+              <button id="verifyTabFile" class="verify-tab active" role="tab" aria-selected="true" type="button">
+                Verify via File
+              </button>
+              <button id="verifyTabHash" class="verify-tab" role="tab" aria-selected="false" type="button">
+                Verify via SHA-256 Hash
+              </button>
+            </div>
+
+            <!-- Tab 1: File Upload Verification -->
+            <div id="verifyFilePane" class="verify-tab-pane active">
+              <div class="form-group">
+                <label class="form-label">Upload Document to Inspect</label>
+                <div id="verifyDropZone" class="drop-zone" tabindex="0" role="button" aria-label="Upload document to verify">
+                  <input type="file" id="verifyFileInput" class="file-input-hidden" aria-label="Choose file to verify">
+                  <div class="drop-zone-content">
+                    <div class="drop-zone-icon">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                    </div>
+                    <p class="drop-zone-primary">
+                      <span class="link-styled">Choose document</span> to verify against the blockchain
+                    </p>
+                    <p class="drop-zone-secondary">
+                      Computes the SHA-256 hash locally and performs an immutable smart contract lookup.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Computed Hash Banner -->
+              <div id="verifyFileInfo" class="file-info-card hidden">
+                <div class="file-info-header">
+                  <div class="file-badge-icon">🔍</div>
+                  <div class="file-details">
+                    <div id="verifyFileName" class="file-name">filename.pdf</div>
+                    <div class="file-meta">
+                      <span id="verifyFileSize">0 KB</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="hash-display-box">
+                  <div class="hash-label-row">
+                    <span class="hash-label">Computed Fingerprint:</span>
+                  </div>
+                  <div id="verifyComputedHash" class="hash-value">0x...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Manual Hash Input Verification -->
+            <div id="verifyHashPane" class="verify-tab-pane hidden">
+              <div class="form-group">
+                <label for="manualHashInput" class="form-label">
+                  Enter Document SHA-256 Hash (bytes32 hex format)
+                </label>
+                <input 
+                  type="text" 
+                  id="manualHashInput" 
+                  class="form-control font-mono" 
+                  placeholder="e.g. 0x8f3c7e4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e"
+                  spellcheck="false"
+                >
+                <span class="form-hint">Must be a valid 64-character hex string (with or without 0x prefix).</span>
+              </div>
+            </div>
+
+            <!-- Verify Action Button -->
+            <div class="form-actions">
+              <button id="verifySubmitBtn" class="btn btn-primary btn-block" type="button" disabled>
+                <span class="btn-spinner hidden" id="verifySpinner"></span>
+                <span id="verifySubmitBtnText">Query Blockchain Ledger</span>
+              </button>
+            </div>
+
+            <!-- Verification Results Display Card (3 states: VERIFIED, NOT VERIFIED, REVOKED) -->
+            <div id="verifyResultCard" class="verify-result-card hidden">
+              <!-- Result Status Header -->
+              <div id="resultStatusHeader" class="result-header state-verified">
+                <div id="resultStatusIcon" class="result-icon">✓</div>
+                <div class="result-status-text">
+                  <h4 id="resultStatusTitle" class="result-title">DOCUMENT VERIFIED</h4>
+                  <p id="resultStatusSubtitle" class="result-subtitle">Authentic blockchain record discovered.</p>
+                </div>
+              </div>
+
+              <!-- Result Details Grid -->
+              <div id="resultDetailsBody" class="result-body">
+                <div class="result-field">
+                  <span class="field-label">Document Title:</span>
+                  <span id="resultDocName" class="field-value font-medium">—</span>
+                </div>
+                <div class="result-field">
+                  <span class="field-label">SHA-256 Hash:</span>
+                  <span id="resultDocHash" class="field-value font-mono break-all">—</span>
+                </div>
+                <div class="result-field">
+                  <span class="field-label">Registered By (Owner):</span>
+                  <span id="resultOwnerAddress" class="field-value font-mono break-all">—</span>
+                </div>
+                <div class="result-field">
+                  <span class="field-label">Registration Timestamp:</span>
+                  <span id="resultTimestamp" class="field-value font-medium">—</span>
+                </div>
+                <div class="result-field" id="resultStatusField">
+                  <span class="field-label">Blockchain Status:</span>
+                  <span id="resultBlockchainStatus" class="status-tag tag-active">Active & Valid</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 5: MY DOCUMENTS                                           -->
+    <!-- ================================================================= -->
+    <section id="my-documents" class="section my-documents-section">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <span class="section-category">PORTFOLIO</span>
+            <h2 class="section-title">My Registered Documents</h2>
+            <p class="section-subtitle">
+              Inspect all document certificates registered under your currently connected MetaMask wallet.
+            </p>
+          </div>
+          <div class="section-header-actions">
+            <button id="refreshMyDocsBtn" class="btn btn-secondary btn-sm" type="button" title="Refresh records from smart contract">
+              <span class="refresh-icon">🔄</span> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Wallet Disconnected Alert -->
+        <div id="myDocsDisconnected" class="state-card state-prompt">
+          <div class="state-icon">👛</div>
+          <h3 class="state-title">Wallet Not Connected</h3>
+          <p class="state-desc">Connect your MetaMask wallet above to retrieve and manage your registered documents.</p>
+          <button id="myDocsConnectBtn" class="btn btn-primary btn-sm" type="button">Connect Wallet</button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="myDocsLoading" class="state-card state-loading hidden">
+          <div class="loading-spinner"></div>
+          <h3 class="state-title">Querying Smart Contract Records...</h3>
+          <p class="state-desc">Scanning blockchain events and storage slots for your account.</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="myDocsEmpty" class="state-card state-empty hidden">
+          <div class="state-icon">📂</div>
+          <h3 class="state-title">No Documents Registered Yet</h3>
+          <p class="state-desc">You have not registered any document hashes with this wallet address yet.</p>
+          <a href="#register-section" class="btn btn-primary btn-sm">Register First Document</a>
+        </div>
+
+        <!-- Documents Table Container -->
+        <div id="myDocsTableWrapper" class="table-responsive hidden">
+          <table class="data-table" aria-label="Registered documents table">
+            <thead>
+              <tr>
+                <th scope="col">Document Title</th>
+                <th scope="col">SHA-256 Hash</th>
+                <th scope="col">Registered Date</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="myDocsTableBody">
+              <!-- Populated dynamically via documents.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Architecture limitation note for academic transparency -->
+        <div class="academic-note-box">
+          <span class="note-icon">💡</span>
+          <div class="note-text">
+            <strong>Architecture Note for College Demonstration:</strong>
+            DocuChain queries smart contract state and indexer events (<code>DocumentRegistered</code>). Only documents registered with your active wallet are displayed here.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 6: BLOCKCHAIN ACTIVITY & TRANSACTION HISTORY              -->
+    <!-- ================================================================= -->
+    <section id="blockchain-history" class="section history-section">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <span class="section-category">AUDIT TRAIL</span>
+            <h2 class="section-title">Blockchain Activity Log</h2>
+            <p class="section-subtitle">
+              Public tamper-proof ledger events emitted by the DocuChain smart contract.
+            </p>
+          </div>
+          <div class="section-header-actions">
+            <button id="refreshEventsBtn" class="btn btn-secondary btn-sm" type="button" title="Fetch latest contract events">
+              <span class="refresh-icon">⚡</span> Refresh Feed
+            </button>
+          </div>
+        </div>
+
+        <!-- History Loading State -->
+        <div id="historyLoading" class="state-card state-loading hidden">
+          <div class="loading-spinner"></div>
+          <h3 class="state-title">Reading Blockchain Logs...</h3>
+          <p class="state-desc">Querying contract event logs from provider.</p>
+        </div>
+
+        <!-- History Empty State -->
+        <div id="historyEmpty" class="state-card state-empty">
+          <div class="state-icon">⛓️</div>
+          <h3 class="state-title">No Blockchain Events Found</h3>
+          <p class="state-desc" id="historyEmptyText">
+            Connect wallet and ensure smart contract address is set in <code>config.js</code> to view live on-chain registration and revocation logs.
+          </p>
+        </div>
+
+        <!-- History List Container -->
+        <div id="historyListWrapper" class="history-list hidden">
+          <!-- Populated dynamically via contract.js -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- REVOCATION CONFIRMATION MODAL                                    -->
+  <!-- ================================================================= -->
+  <div id="revokeModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-danger-icon">⚠️</div>
+        <h3 id="modalTitle" class="modal-title">Revoke Document Registration?</h3>
+      </div>
+      <div class="modal-body">
+        <p class="modal-warning-text">
+          Revocation is an <strong>irreversible on-chain action</strong>. Once revoked, anyone who verifies this document will be notified that the certificate is no longer valid.
+        </p>
+        <div class="modal-doc-summary">
+          <div><strong>Document:</strong> <span id="modalDocTitle">—</span></div>
+          <div><strong>Hash:</strong> <span id="modalDocHash" class="font-mono break-all">—</span></div>
+        </div>
+        <p class="modal-gas-note">
+          This operation calls the smart contract's revocation function and requires MetaMask transaction approval and gas fees.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelRevokeBtn" class="btn btn-secondary" type="button">Cancel</button>
+        <button id="confirmRevokeBtn" class="btn btn-danger" type="button">
+          <span class="btn-spinner hidden" id="revokeSpinner"></span>
+          <span id="confirmRevokeBtnText">Confirm Revocation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- TOAST NOTIFICATIONS CONTAINER                                     -->
+  <!-- ================================================================= -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ================================================================= -->
+  <!-- FOOTER                                                            -->
+  <!-- ================================================================= -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <img src="assets/logo.svg" alt="DocuChain" class="footer-logo" width="150" height="38">
+        <p class="footer-desc">
+          Blockchain-Based Document Registration & Verification System. Academic Capstone Project built with Ethereum, Solidity, Ethers.js v6, and MetaMask.
+        </p>
+      </div>
+
+      <div class="footer-links-group">
+        <h4 class="footer-heading">Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#register-section">Register Document</a></li>
+          <li><a href="#verify-section">Verify Document</a></li>
+          <li><a href="#my-documents">My Documents</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-tech">
+        <h4 class="footer-heading">Technology Stack</h4>
+        <div class="tech-pills">
+          <span class="tech-pill">Solidity</span>
+          <span class="tech-pill">Ethers.js v6</span>
+          <span class="tech-pill">MetaMask EIP-1193</span>
+          <span class="tech-pill">Web Crypto SHA-256</span>
+          <span class="tech-pill">Vanilla JS ES Modules</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom container">
+      <p class="copyright">© 2026 DocuChain. All rights reserved. Academic Project Demonstration.</p>
+      <p class="zero-storage">Zero-Storage Architecture: Client files are cryptographically hashed in-memory only.</p>
+    </div>
+  </footer>
+
+  <!-- Application Main Entry Script (ES Module) -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

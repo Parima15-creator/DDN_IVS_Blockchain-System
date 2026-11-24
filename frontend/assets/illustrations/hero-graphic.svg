@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 440" fill="none">
+  <defs>
+    <filter id="card-shadow" x="-8%" y="-8%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#1B2421" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#1B2421" flood-opacity="0.04"/>
+    </filter>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F5F9F6"/>
+    </linearGradient>
+    <linearGradient id="teal-accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3AA484"/>
+      <stop offset="100%" stop-color="#247259"/>
+    </linearGradient>
+    <linearGradient id="gold-stamp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient Decorative Shapes -->
+  <circle cx="430" cy="90" r="70" fill="#E2EEE7" opacity="0.6"/>
+  <circle cx="80" cy="360" r="90" fill="#E8F1EC" opacity="0.5"/>
+  <rect x="390" y="310" width="80" height="80" rx="20" fill="#D8E8DF" opacity="0.4" transform="rotate(15 390 310)"/>
+
+  <!-- Main Certificate / Document Card -->
+  <g filter="url(#card-shadow)">
+    <rect x="50" y="30" width="420" height="360" rx="24" fill="url(#bg-grad)" stroke="#E1EBE4" stroke-width="1.5"/>
+
+    <!-- Document Header bar -->
+    <rect x="74" y="58" width="160" height="12" rx="6" fill="#1B2421" opacity="0.85"/>
+    <rect x="74" y="78" width="220" height="8" rx="4" fill="#90A197"/>
+
+    <!-- Status Badge (Top Right) -->
+    <rect x="330" y="52" width="116" height="32" rx="16" fill="#E8F7F0" stroke="#B8E6D2" stroke-width="1"/>
+    <circle cx="346" cy="68" r="4" fill="#2E8B6E"/>
+    <text x="356" y="72" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#247259" letter-spacing="0.5">ON-CHAIN VERIFIED</text>
+
+    <!-- Document Preview Body Area -->
+    <rect x="74" y="106" width="372" height="150" rx="14" fill="#F8FAF8" stroke="#E9EFEA" stroke-width="1"/>
+
+    <!-- Document Mock Lines -->
+    <rect x="96" y="128" width="180" height="10" rx="5" fill="#C5D3CB"/>
+    <rect x="96" y="148" width="280" height="7" rx="3.5" fill="#E2EBE5"/>
+    <rect x="96" y="163" width="240" height="7" rx="3.5" fill="#E2EBE5"/>
+    <rect x="96" y="178" width="260" height="7" rx="3.5" fill="#E2EBE5"/>
+
+    <!-- SHA-256 Hash Display Box inside card -->
+    <rect x="96" y="200" width="328" height="38" rx="8" fill="#FFFFFF" stroke="#DCE5DF" stroke-width="1"/>
+    <text x="110" y="216" font-family="monospace" font-size="9" font-weight="600" fill="#718279">SHA-256 FINGERPRINT</text>
+    <text x="110" y="230" font-family="monospace" font-size="11" font-weight="700" fill="#1F634E">0x8f3c7e4a...92b50d1e67a4c9</text>
+
+    <!-- Contract stamp badge -->
+    <g transform="translate(355, 120)">
+      <circle cx="28" cy="28" r="26" fill="url(#teal-accent)"/>
+      <path d="M20 28 L26 34 L37 22" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Document Metadata Footer Row -->
+    <g transform="translate(74, 276)">
+      <!-- Metadata Block 1 -->
+      <text x="0" y="12" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="600" fill="#88988F">REGISTERED BLOCK</text>
+      <text x="0" y="28" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#1B2421">#5,892,104</text>
+
+      <!-- Metadata Block 2 -->
+      <text x="140" y="12" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="600" fill="#88988F">NETWORK</text>
+      <text x="140" y="28" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#1B2421">Ethereum Sepolia</text>
+
+      <!-- Metadata Block 3 -->
+      <text x="270" y="12" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="600" fill="#88988F">TAMPER INTEGRITY</text>
+      <text x="270" y="28" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#2E8B6E">100% Valid</text>
+    </g>
+
+    <!-- Progress / Integrity bar -->
+    <rect x="74" y="328" width="372" height="6" rx="3" fill="#E8EFEA"/>
+    <rect x="74" y="328" width="372" height="6" rx="3" fill="url(#teal-accent)"/>
+  </g>
+
+  <!-- Floating Micro Cards (KeyNest style interactive polish) -->
+  <!-- Top-left floating badge -->
+  <g transform="translate(20, 80)" filter="url(#card-shadow)">
+    <rect width="145" height="52" rx="14" fill="#FFFFFF" stroke="#E1EBE4"/>
+    <circle cx="28" cy="26" r="14" fill="#E8F7F0"/>
+    <path d="M24 26 L27 29 L33 23" stroke="#2E8B6E" stroke-width="2.2" stroke-linecap="round"/>
+    <text x="50" y="22" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="600" fill="#718279">PRIVACY PROMISE</text>
+    <text x="50" y="36" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#1B2421">Zero Raw Storage</text>
+  </g>
+
+  <!-- Bottom-right floating card -->
+  <g transform="translate(310, 310)" filter="url(#card-shadow)">
+    <rect width="180" height="62" rx="16" fill="#1B2421"/>
+    <circle cx="32" cy="31" r="15" fill="#2D3B34"/>
+    <!-- Key icon -->
+    <path d="M28 29 L35 24 M33 25 L35 27 M30 31 C28.5 32.5 26 32.5 24.5 31 C23 29.5 23 27 24.5 25.5 C26 24 28.5 24 30 25.5" stroke="#4ADE80" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="56" y="26" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="500" fill="#A3B4AA">Smart Contract</text>
+    <text x="56" y="42" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Ethers.js v6 Active</text>
+  </g>
+</svg>
