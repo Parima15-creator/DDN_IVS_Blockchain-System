@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initializes UI default state.
  */
 function initUI() {
-  if (!isMetaMaskInstalled()) {
+  if (!isMetaMaskInstalled() && DOM.walletBtnText && DOM.networkNameText) {
     DOM.walletBtnText.textContent = 'Install MetaMask';
     DOM.networkNameText.textContent = 'MetaMask Required';
   }
@@ -186,11 +186,21 @@ function initUI() {
           e.preventDefault();
           targetElem.scrollIntoView({ behavior: 'smooth' });
           // Close mobile menu if open
-          DOM.navLinks.classList.remove('mobile-open');
+          if (DOM.navLinks) {
+            DOM.navLinks.classList.remove('mobile-open');
+            DOM.menuToggle.setAttribute('aria-expanded', 'false');
+          }
         }
       }
     });
   });
+
+  const hash = new URLSearchParams(window.location.search).get('hash');
+  if (hash && DOM.manualHashInput) {
+    DOM.manualHashInput.value = hash;
+    setVerificationMode('HASH');
+    handleManualHashInput();
+  }
 }
 
 /**
@@ -198,10 +208,12 @@ function initUI() {
  */
 function checkContractConfigStatus() {
   if (!isContractConfigured()) {
-    DOM.contractConfigNotice.classList.remove('hidden');
-    DOM.historyEmptyText.textContent =
-      'Contract address is not configured yet. Please insert your deployed contract address in config.js to fetch on-chain logs.';
-  } else {
+    DOM.contractConfigNotice?.classList.remove('hidden');
+    if (DOM.historyEmptyText) {
+      DOM.historyEmptyText.textContent =
+        'Contract address is not configured yet. Please insert your deployed contract address in config.js to fetch on-chain logs.';
+    }
+  } else if (DOM.contractConfigNotice) {
     DOM.contractConfigNotice.classList.add('hidden');
   }
 }
@@ -211,15 +223,16 @@ function checkContractConfigStatus() {
  */
 function setupEventListeners() {
   // Mobile nav toggle
-  DOM.menuToggle.addEventListener('click', () => {
-    DOM.navLinks.classList.toggle('mobile-open');
+  DOM.menuToggle?.addEventListener('click', () => {
+    const isOpen = DOM.navLinks.classList.toggle('mobile-open');
+    DOM.menuToggle.setAttribute('aria-expanded', String(isOpen));
   });
 
   // Wallet Connection Button
-  DOM.walletBtn.addEventListener('click', handleWalletButtonClick);
-  DOM.myDocsConnectBtn.addEventListener('click', handleWalletButtonClick);
-  DOM.disconnectBtn.addEventListener('click', handleDisconnectClick);
-  DOM.switchNetworkBtn.addEventListener('click', handleSwitchNetworkClick);
+  DOM.walletBtn?.addEventListener('click', handleWalletButtonClick);
+  DOM.myDocsConnectBtn?.addEventListener('click', handleWalletButtonClick);
+  DOM.disconnectBtn?.addEventListener('click', handleDisconnectClick);
+  DOM.switchNetworkBtn?.addEventListener('click', handleSwitchNetworkClick);
 
   // Wallet Event Subscriptions
   onAccountChange(handleAccountChanged);
@@ -227,28 +240,32 @@ function setupEventListeners() {
   onDisconnect(handleDisconnectedState);
 
   // Registration: File Upload & Drag-and-Drop
-  setupDropZone(DOM.dropZone, DOM.fileInput, handleRegisterFileSelected);
-  DOM.removeFileBtn.addEventListener('click', resetRegistrationFile);
-  DOM.copyHashBtn.addEventListener('click', copyRegisteredHash);
-  DOM.docTitleInput.addEventListener('input', updateRegisterButtonState);
-  DOM.registerForm.addEventListener('submit', handleRegisterFormSubmit);
+  if (DOM.dropZone && DOM.fileInput) {
+    setupDropZone(DOM.dropZone, DOM.fileInput, handleRegisterFileSelected);
+  }
+  DOM.removeFileBtn?.addEventListener('click', resetRegistrationFile);
+  DOM.copyHashBtn?.addEventListener('click', copyRegisteredHash);
+  DOM.docTitleInput?.addEventListener('input', updateRegisterButtonState);
+  DOM.registerForm?.addEventListener('submit', handleRegisterFormSubmit);
 
   // Verification: Tab Switching
-  DOM.verifyTabFile.addEventListener('click', () => setVerificationMode('FILE'));
-  DOM.verifyTabHash.addEventListener('click', () => setVerificationMode('HASH'));
+  DOM.verifyTabFile?.addEventListener('click', () => setVerificationMode('FILE'));
+  DOM.verifyTabHash?.addEventListener('click', () => setVerificationMode('HASH'));
 
   // Verification: File Upload & Manual Input
-  setupDropZone(DOM.verifyDropZone, DOM.verifyFileInput, handleVerifyFileSelected);
-  DOM.manualHashInput.addEventListener('input', handleManualHashInput);
-  DOM.verifySubmitBtn.addEventListener('click', handleVerifySubmit);
+  if (DOM.verifyDropZone && DOM.verifyFileInput) {
+    setupDropZone(DOM.verifyDropZone, DOM.verifyFileInput, handleVerifyFileSelected);
+  }
+  DOM.manualHashInput?.addEventListener('input', handleManualHashInput);
+  DOM.verifySubmitBtn?.addEventListener('click', handleVerifySubmit);
 
   // My Documents & History Refreshes
-  DOM.refreshMyDocsBtn.addEventListener('click', loadUserDocuments);
-  DOM.refreshEventsBtn.addEventListener('click', loadBlockchainHistory);
+  DOM.refreshMyDocsBtn?.addEventListener('click', loadUserDocuments);
+  DOM.refreshEventsBtn?.addEventListener('click', loadBlockchainHistory);
 
   // Revocation Modal Buttons
-  DOM.cancelRevokeBtn.addEventListener('click', closeRevocationModal);
-  DOM.confirmRevokeBtn.addEventListener('click', handleConfirmRevocation);
+  DOM.cancelRevokeBtn?.addEventListener('click', closeRevocationModal);
+  DOM.confirmRevokeBtn?.addEventListener('click', handleConfirmRevocation);
 }
 
 /* --------------------------------------------------------------------------
@@ -262,8 +279,8 @@ async function handleWalletButtonClick() {
   }
 
   try {
-    DOM.walletBtn.disabled = true;
-    DOM.walletBtnText.textContent = 'Connecting...';
+    if (DOM.walletBtn) DOM.walletBtn.disabled = true;
+    if (DOM.walletBtnText) DOM.walletBtnText.textContent = 'Connecting...';
 
     const accountData = await connectWallet();
     showToast(`Connected: ${shortenAddress(accountData.address)}`, 'success');
@@ -274,7 +291,7 @@ async function handleWalletButtonClick() {
       showToast(err.message || 'Failed to connect MetaMask.', 'error');
     }
   } finally {
-    DOM.walletBtn.disabled = false;
+    if (DOM.walletBtn) DOM.walletBtn.disabled = false;
   }
 }
 
@@ -285,25 +302,25 @@ function handleDisconnectClick() {
 
 async function handleSwitchNetworkClick() {
   try {
-    DOM.switchNetworkBtn.disabled = true;
-    DOM.switchNetworkBtn.textContent = 'Switching...';
+    if (DOM.switchNetworkBtn) DOM.switchNetworkBtn.disabled = true;
+    if (DOM.switchNetworkBtn) DOM.switchNetworkBtn.textContent = 'Switching...';
     await switchNetwork();
     showToast(`Switched network to ${NETWORK_CONFIG.networkName}`, 'success');
   } catch (err) {
     showToast(err.message || 'Could not switch network.', 'error');
   } finally {
-    DOM.switchNetworkBtn.disabled = false;
-    DOM.switchNetworkBtn.textContent = 'Switch Network';
+    if (DOM.switchNetworkBtn) DOM.switchNetworkBtn.disabled = false;
+    if (DOM.switchNetworkBtn) DOM.switchNetworkBtn.textContent = 'Switch Network';
   }
 }
 
 function handleAccountChanged(address) {
   if (address) {
-    DOM.walletBtn.classList.add('connected');
-    DOM.walletBtnText.textContent = shortenAddress(address);
-    DOM.disconnectBtn.classList.remove('hidden');
+    DOM.walletBtn?.classList.add('connected');
+    if (DOM.walletBtnText) DOM.walletBtnText.textContent = shortenAddress(address);
+    DOM.disconnectBtn?.classList.remove('hidden');
 
-    DOM.myDocsDisconnected.classList.add('hidden');
+    DOM.myDocsDisconnected?.classList.add('hidden');
     loadUserDocuments();
     loadBlockchainHistory();
   } else {
@@ -312,42 +329,44 @@ function handleAccountChanged(address) {
 }
 
 function handleNetworkChanged(chainId, isCorrectNetwork) {
-  DOM.networkPill.classList.remove('disconnected', 'connected', 'wrong-network');
+  DOM.networkPill?.classList.remove('disconnected', 'connected', 'wrong-network');
 
   if (!walletState.isConnected) {
-    DOM.networkPill.classList.add('disconnected');
-    DOM.networkNameText.textContent = 'Not Connected';
-    DOM.networkBanner.classList.add('hidden');
+    DOM.networkPill?.classList.add('disconnected');
+    if (DOM.networkNameText) DOM.networkNameText.textContent = 'Not Connected';
+    DOM.networkBanner?.classList.add('hidden');
     return;
   }
 
   if (isCorrectNetwork) {
-    DOM.networkPill.classList.add('connected');
-    DOM.networkNameText.textContent = NETWORK_CONFIG.networkName;
-    DOM.networkBanner.classList.add('hidden');
+    DOM.networkPill?.classList.add('connected');
+    if (DOM.networkNameText) DOM.networkNameText.textContent = NETWORK_CONFIG.networkName;
+    DOM.networkBanner?.classList.add('hidden');
   } else {
-    DOM.networkPill.classList.add('wrong-network');
-    DOM.networkNameText.textContent = `Chain ID: ${chainId} (Unsupported)`;
-    DOM.networkBanner.classList.remove('hidden');
-    DOM.networkBannerText.textContent = `Unsupported Network (Chain ID ${chainId}). Please switch to ${NETWORK_CONFIG.networkName} (${NETWORK_CONFIG.chainId}).`;
+    DOM.networkPill?.classList.add('wrong-network');
+    if (DOM.networkNameText) DOM.networkNameText.textContent = `Chain ID: ${chainId} (Unsupported)`;
+    DOM.networkBanner?.classList.remove('hidden');
+    if (DOM.networkBannerText) {
+      DOM.networkBannerText.textContent = `Unsupported Network (Chain ID ${chainId}). Please switch to ${NETWORK_CONFIG.networkName} (${NETWORK_CONFIG.chainId}).`;
+    }
   }
 }
 
 function handleDisconnectedState() {
-  DOM.walletBtn.classList.remove('connected');
-  DOM.walletBtnText.textContent = 'Connect Wallet';
-  DOM.disconnectBtn.classList.add('hidden');
+  DOM.walletBtn?.classList.remove('connected');
+  if (DOM.walletBtnText) DOM.walletBtnText.textContent = 'Connect Wallet';
+  DOM.disconnectBtn?.classList.add('hidden');
 
-  DOM.networkPill.classList.remove('connected', 'wrong-network');
-  DOM.networkPill.classList.add('disconnected');
-  DOM.networkNameText.textContent = 'Not Connected';
-  DOM.networkBanner.classList.add('hidden');
+  DOM.networkPill?.classList.remove('connected', 'wrong-network');
+  DOM.networkPill?.classList.add('disconnected');
+  if (DOM.networkNameText) DOM.networkNameText.textContent = 'Not Connected';
+  DOM.networkBanner?.classList.add('hidden');
 
   // Reset My Documents
-  DOM.myDocsDisconnected.classList.remove('hidden');
-  DOM.myDocsLoading.classList.add('hidden');
-  DOM.myDocsEmpty.classList.add('hidden');
-  DOM.myDocsTableWrapper.classList.add('hidden');
+  DOM.myDocsDisconnected?.classList.remove('hidden');
+  DOM.myDocsLoading?.classList.add('hidden');
+  DOM.myDocsEmpty?.classList.add('hidden');
+  DOM.myDocsTableWrapper?.classList.add('hidden');
 }
 
 /* --------------------------------------------------------------------------
@@ -474,7 +493,7 @@ async function handleRegisterFormSubmit(e) {
   // Check contract address configuration
   if (!isContractConfigured()) {
     showToast('Contract address is not set in config.js. Please provide a deployed address.', 'error');
-    DOM.contractConfigNotice.scrollIntoView({ behavior: 'smooth' });
+    DOM.contractConfigNotice?.scrollIntoView({ behavior: 'smooth' });
     return;
   }
 
@@ -618,7 +637,7 @@ async function handleVerifySubmit() {
 
   if (!isContractConfigured()) {
     showToast('Smart contract is not configured in config.js. Cannot verify.', 'error');
-    DOM.contractConfigNotice.scrollIntoView({ behavior: 'smooth' });
+    DOM.contractConfigNotice?.scrollIntoView({ behavior: 'smooth' });
     return;
   }
 
@@ -693,6 +712,8 @@ function renderVerificationResult(result) {
    5. My Documents Section
    -------------------------------------------------------------------------- */
 async function loadUserDocuments() {
+  if (!DOM.myDocsTableBody) return;
+
   if (!walletState.isConnected || !walletState.address) {
     DOM.myDocsDisconnected.classList.remove('hidden');
     DOM.myDocsLoading.classList.add('hidden');
@@ -768,11 +789,7 @@ function renderUserDocumentsTable(docs) {
       if (action === 'copy') {
         navigator.clipboard.writeText(hash).then(() => showToast('Hash copied to clipboard.', 'info'));
       } else if (action === 'verify') {
-        setVerificationMode('HASH');
-        DOM.manualHashInput.value = hash;
-        DOM.verifySubmitBtn.disabled = false;
-        document.getElementById('verify-section').scrollIntoView({ behavior: 'smooth' });
-        handleVerifySubmit();
+        window.location.href = `verify.html?hash=${encodeURIComponent(hash)}`;
       } else if (action === 'revoke') {
         openRevocationModal(hash, name);
       }
@@ -830,6 +847,8 @@ async function handleConfirmRevocation() {
    7. Blockchain History Feed
    -------------------------------------------------------------------------- */
 async function loadBlockchainHistory() {
+  if (!DOM.historyListWrapper) return;
+
   if (!isContractConfigured()) {
     DOM.historyLoading.classList.add('hidden');
     DOM.historyEmpty.classList.remove('hidden');
@@ -918,6 +937,7 @@ function showToast(message, type = 'info', duration = 4000) {
     <span>${escapeHtml(message)}</span>
   `;
 
+  if (!DOM.toastContainer) return;
   DOM.toastContainer.appendChild(toast);
 
   setTimeout(() => {

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Documents - DocuChain</title>
+  <meta name="description" content="Secure, tamper-proof digital document registration and verification powered by Ethereum smart contracts and SHA-256 cryptographic hashing.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Google Fonts: Plus Jakarta Sans for a clean, modern SaaS aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Ethers.js v6 via CDN (UMD bundle) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha512-V3xRGsQMQ8CG4l2gVN44TCDmNY5cdlxbSvejrgmWxcLKHft0Q3XQDbeuJ9aot14mpNuRWGtI//WKraedDGNZ+g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<aside id="networkBanner" class="network-banner hidden" role="alert" aria-live="assertive">
+    <div class="network-banner-content">
+      <span class="banner-icon">⚠️</span>
+      <span id="networkBannerText">You are connected to an unsupported network. Please switch to the expected network.</span>
+      <button id="switchNetworkBtn" class="btn-banner-action" type="button">Switch Network</button>
+    </div>
+  </aside>
+
+  <!-- ================================================================= -->
+  <!-- NAVIGATION BAR                                                    -->
+  <!-- ================================================================= -->
+  <header class="navbar-wrapper">
+    <nav class="navbar container" aria-label="Main Navigation">
+      <!-- Logo -->
+      <a href="index.html" class="brand-logo" aria-label="DocuChain Home">
+        <img src="assets/logo.svg" alt="DocuChain" class="logo-img" width="168" height="42">
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+        <li><a href="register.html" class="nav-link">Register Document</a></li>
+        <li><a href="verify.html" class="nav-link">Verify Document</a></li>
+        <li><a href="documents.html" class="nav-link active">My Documents</a></li>
+        <li><a href="history.html" class="nav-link">Blockchain History</a></li>
+      </ul>
+
+      <!-- Wallet Controls -->
+      <div class="nav-actions">
+        <!-- Network Badge -->
+        <div id="networkPill" class="network-pill disconnected" title="Network status">
+          <span class="status-dot"></span>
+          <span id="networkNameText">Not Connected</span>
+        </div>
+
+        <!-- Connect Wallet Button -->
+        <button id="walletBtn" class="btn btn-wallet" type="button">
+          <span class="wallet-btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+            </svg>
+          </span>
+          <span id="walletBtnText">Connect Wallet</span>
+        </button>
+
+        <!-- Disconnect dropdown button (hidden by default) -->
+        <button id="disconnectBtn" class="btn-disconnect-icon hidden" type="button" title="Disconnect Session" aria-label="Disconnect Session">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+
+  <main>
+    <section id="my-documents" class="section my-documents-section">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <span class="section-category">PORTFOLIO</span>
+            <h2 class="section-title">My Registered Documents</h2>
+            <p class="section-subtitle">
+              Inspect all document certificates registered under your currently connected MetaMask wallet.
+            </p>
+          </div>
+          <div class="section-header-actions">
+            <button id="refreshMyDocsBtn" class="btn btn-secondary btn-sm" type="button" title="Refresh records from smart contract">
+              <span class="refresh-icon">🔄</span> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Wallet Disconnected Alert -->
+        <div id="myDocsDisconnected" class="state-card state-prompt">
+          <div class="state-icon">👛</div>
+          <h3 class="state-title">Wallet Not Connected</h3>
+          <p class="state-desc">Connect your MetaMask wallet above to retrieve and manage your registered documents.</p>
+          <button id="myDocsConnectBtn" class="btn btn-primary btn-sm" type="button">Connect Wallet</button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="myDocsLoading" class="state-card state-loading hidden">
+          <div class="loading-spinner"></div>
+          <h3 class="state-title">Querying Smart Contract Records...</h3>
+          <p class="state-desc">Scanning blockchain events and storage slots for your account.</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="myDocsEmpty" class="state-card state-empty hidden">
+          <div class="state-icon">📂</div>
+          <h3 class="state-title">No Documents Registered Yet</h3>
+          <p class="state-desc">You have not registered any document hashes with this wallet address yet.</p>
+          <a href="register.html" class="btn btn-primary btn-sm">Register First Document</a>
+        </div>
+
+        <!-- Documents Table Container -->
+        <div id="myDocsTableWrapper" class="table-responsive hidden">
+          <table class="data-table" aria-label="Registered documents table">
+            <thead>
+              <tr>
+                <th scope="col">Document Title</th>
+                <th scope="col">SHA-256 Hash</th>
+                <th scope="col">Registered Date</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="myDocsTableBody">
+              <!-- Populated dynamically via documents.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Architecture limitation note for academic transparency -->
+        <div class="academic-note-box">
+          <span class="note-icon">💡</span>
+          <div class="note-text">
+            <strong>Architecture Note for College Demonstration:</strong>
+            DocuChain queries smart contract state and indexer events (<code>DocumentRegistered</code>). Only documents registered with your active wallet are displayed here.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+    <div id="revokeModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-danger-icon">⚠️</div>
+        <h3 id="modalTitle" class="modal-title">Revoke Document Registration?</h3>
+      </div>
+      <div class="modal-body">
+        <p class="modal-warning-text">
+          Revocation is an <strong>irreversible on-chain action</strong>. Once revoked, anyone who verifies this document will be notified that the certificate is no longer valid.
+        </p>
+        <div class="modal-doc-summary">
+          <div><strong>Document:</strong> <span id="modalDocTitle">—</span></div>
+          <div><strong>Hash:</strong> <span id="modalDocHash" class="font-mono break-all">—</span></div>
+        </div>
+        <p class="modal-gas-note">
+          This operation calls the smart contract's revocation function and requires MetaMask transaction approval and gas fees.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelRevokeBtn" class="btn btn-secondary" type="button">Cancel</button>
+        <button id="confirmRevokeBtn" class="btn btn-danger" type="button">
+          <span class="btn-spinner hidden" id="revokeSpinner"></span>
+          <span id="confirmRevokeBtnText">Confirm Revocation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <img src="assets/logo.svg" alt="DocuChain" class="footer-logo" width="150" height="38">
+        <p class="footer-desc">
+          Blockchain-Based Document Registration & Verification System. Academic Capstone Project built with Ethereum, Solidity, Ethers.js v6, and MetaMask.
+        </p>
+      </div>
+
+      <div class="footer-links-group">
+        <h4 class="footer-heading">Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="how-it-works.html">How It Works</a></li>
+          <li><a href="register.html">Register Document</a></li>
+          <li><a href="verify.html">Verify Document</a></li>
+          <li><a href="documents.html">My Documents</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-tech">
+        <h4 class="footer-heading">Technology Stack</h4>
+        <div class="tech-pills">
+          <span class="tech-pill">Solidity</span>
+          <span class="tech-pill">Ethers.js v6</span>
+          <span class="tech-pill">MetaMask EIP-1193</span>
+          <span class="tech-pill">Web Crypto SHA-256</span>
+          <span class="tech-pill">Vanilla JS ES Modules</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom container">
+      <p class="copyright">© 2026 DocuChain. All rights reserved. Academic Project Demonstration.</p>
+      <p class="zero-storage">Zero-Storage Architecture: Client files are cryptographically hashed in-memory only.</p>
+    </div>
+  </footer>
+
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

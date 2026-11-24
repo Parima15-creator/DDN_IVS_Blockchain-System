@@ -109,9 +109,14 @@ blockchain/
 │   └── DocuChain.sol              # Complete, gas-optimized Solidity smart contract
 │
 ├── frontend/
-│   ├── index.html                 # Semantic HTML structure & accessible layouts
+│   ├── index.html                 # Landing page
+│   ├── how-it-works.html          # Architecture and workflow page
+│   ├── register.html              # Document registration page
+│   ├── verify.html                # Document verification page
+│   ├── documents.html             # Connected wallet document portfolio
+│   ├── history.html               # Public blockchain activity feed
 │   ├── style.css                  # KeyNest-inspired CSS stylesheet & responsive breakpoints
-│   ├── app.js                     # Main application orchestrator & DOM coordinator
+│   ├── app.js                     # Shared application behavior across pages
 │   ├── config.js                  # Contract address, ABI array, and network presets
 │   │
 │   ├── assets/
@@ -132,15 +137,14 @@ blockchain/
 
 ### Detailed File Responsibilities
 
-1. **`frontend/index.html`**:
-   - Navigation bar with network indicator and shortened wallet address button.
-   - KeyNest-style split hero section with large bold typography and visual.
-   - 3-step "How It Works" workflow guide.
-   - Interactive document registration interface with drag-and-drop file upload.
-   - Interactive verification interface supporting file upload or manual hash query.
-   - "My Documents" section displaying wallet-registered records.
-   - Live "Blockchain Activity Log" feed querying contract events.
-   - Permanent document revocation confirmation modal.
+1. **Frontend pages**:
+   - `index.html` is the product landing page; each application feature has a dedicated page linked from the shared navigation.
+   - `how-it-works.html` explains the three-step workflow.
+   - `register.html` provides drag-and-drop document registration.
+   - `verify.html` supports verification by file or manual hash; document shortcuts can open it with a prefilled hash.
+   - `documents.html` shows documents registered by the connected wallet and supports revocation.
+   - `history.html` displays public blockchain activity.
+   - Each page shares the wallet/network controls and loads `app.js`, which initializes only controls available on that page.
 
 2. **`frontend/style.css`**:
    - Implements KeyNest design tokens: pale sage-green `#EFF4F0`, soft off-white cards, dark charcoal typography, rounded pill buttons, soft yellow highlight tag.
